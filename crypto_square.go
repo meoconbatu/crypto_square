@@ -14,23 +14,28 @@ func Encode(pt string) string {
 	if lenPt == 0 {
 		return ""
 	}
-	_, c := GetSizeOfRectangle(lenPt)
-	lenCt := lenPt + c - 1
-	ct := make([]byte, lenCt)
-	iCt := 0
-	for i := 0; i < c; i++ {
-		for j := i; j < lenPt; j = j + c {
-			ct[iCt] = pt[j]
-			iCt = iCt + 1
+	r, c := GetSizeOfRectangle(lenPt)
+	lenCt := lenPt + int(c) - 1
+	ct := make([]rune, lenCt)
+
+	aa := int(r)*int(c) - lenPt
+	aaa := int(c) - aa
+	var xx, xy, j int
+	for i, a := range pt {
+		xx = int(math.Mod(float64(i), c))
+		xy = int(math.Floor(float64(i) / c))
+		j = xx*(int(r)+1) + xy
+		if xx >= aaa && aa > 1 {
+			j = j - (xx - aaa)
 		}
-		if i+1 < c {
-			ct[iCt] = byte(' ')
-			iCt = iCt + 1
+		ct[j] = a
+		if xy == 0 && j > 0 {
+			ct[j-1] = rune(' ')
 		}
 	}
 	return string(ct)
 }
-func GetSizeOfRectangle(lenPt int) (int, int) {
+func GetSizeOfRectangle(lenPt int) (float64, float64) {
 	var c float64
 	r := math.Sqrt(float64(lenPt))
 	floorR := math.Floor(math.Sqrt(float64(lenPt)))
@@ -44,7 +49,7 @@ func GetSizeOfRectangle(lenPt int) (int, int) {
 		r = floorR
 		c = r + 1
 	}
-	return int(r), int(c)
+	return r, c
 }
 func Normalize(pt string) string {
 	pt = strings.ToLower(pt)
